@@ -11,7 +11,7 @@ import (
 	"github.com/prometheus/prometheus/promql/parser"
 )
 
-func injectProjectLabel(r *http.Request) {
+func injectProjectLabel(w http.ResponseWriter, r *http.Request) bool {
 	labelEnforcer := injectproxy.NewEnforcer(
 		false,
 		&labels.Matcher{
@@ -22,7 +22,7 @@ func injectProjectLabel(r *http.Request) {
 	)
 	if err := r.ParseForm(); err != nil {
 		log.Printf("[ERROR] %s\n", err)
-		return
+		return false
 	}
 	formData := r.Form
 	for key, values := range formData {
@@ -32,11 +32,11 @@ func injectProjectLabel(r *http.Request) {
 				expr, err := parser.ParseExpr(value)
 				if err != nil {
 					log.Printf("[ERROR] %s\n", err)
-					return
+					return false
 				}
 				if err := labelEnforcer.EnforceNode(expr); err != nil {
 					log.Printf("[ERROR] %s\n", err)
-					return
+					return false
 				}
 				formData.Add(key, expr.String())
 			}
@@ -49,4 +49,5 @@ func injectProjectLabel(r *http.Request) {
 		r.Body = ioutil.NopCloser(strings.NewReader(newFormData))
 		r.ContentLength = int64(len(newFormData))
 	}
+	return true
 }

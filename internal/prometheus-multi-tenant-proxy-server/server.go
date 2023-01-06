@@ -10,26 +10,17 @@ import (
 )
 
 var config Config
+var prometheusAddress *url.URL
 
 func Run(c *cli.Context) error {
 	config = parseConfigFile(c.String("config"))
-	prometheusAddress, err := url.Parse(config.Global.PrometheusAddress)
+	promURL, err := url.Parse(config.Global.PrometheusAddress)
 	if err != nil {
 		log.Fatal(err)
 	}
+	prometheusAddress = promURL
 	reverseProxy := httputil.NewSingleHostReverseProxy(prometheusAddress)
-	originalDirector := reverseProxy.Director
-	reverseProxy.Director = func(r *http.Request) {
-		originalDirector(r)
-		injectProjectLabel(r)
-		func(r *http.Request) {
-			r.Host = prometheusAddress.Host
-			r.URL.Host = prometheusAddress.Host
-			r.URL.Scheme = prometheusAddress.Scheme
-			r.Header.Del("Authorization")
-		}(r)
-	}
-	http.HandleFunc("/", logRequest(checkAccess(reverseProxy.ServeHTTP)))
+	http.HandleFunc("/", processRequest(reverseProxy.ServeHTTP))
 	if err = http.ListenAndServe(":9999", nil); err != nil {
 		log.Fatal(err)
 	}

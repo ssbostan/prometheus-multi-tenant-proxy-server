@@ -4,30 +4,28 @@ import (
 	"crypto/sha1"
 	"crypto/subtle"
 	"encoding/hex"
+	"log"
+	"net"
 	"net/http"
 	"reflect"
 )
 
-func checkAccess(handler http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		username, password, ok := r.BasicAuth()
-		user := getUser(username)
-		if !ok || reflect.ValueOf(user).IsZero() == true {
-			unauthorizedAccess(w)
-			return
-		}
-		if !authenticate(user, password) || !authorize(user, r.Header.Get("X-Project-Name")) {
-			unauthorizedAccess(w)
-			return
-		}
-		handler(w, r)
+func authUser(w http.ResponseWriter, r *http.Request) bool {
+	username, password, ok := r.BasicAuth()
+	user := getUser(username)
+	project := r.Header.Get("X-Project-Name")
+	ip, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		ip = r.RemoteAddr
 	}
-}
-
-func unauthorizedAccess(w http.ResponseWriter) {
-	w.Header().Set("WWW-Authenticate", `Basic realm="Prometheus Multi-tenant Proxy Server"`)
-	w.WriteHeader(401)
-	w.Write([]byte("401 Unauthorized\n"))
+	if !ok || reflect.ValueOf(user).IsZero() == true {
+		return false
+	}
+	if !authenticate(user, password) || !authorize(user, project) {
+		log.Printf("[WARNING] Unauthorized request ip=%s user=%s\n", ip, username)
+		return false
+	}
+	return true
 }
 
 func getUser(username string) UserConfiguration {
