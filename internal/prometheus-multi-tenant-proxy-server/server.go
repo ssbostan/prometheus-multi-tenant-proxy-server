@@ -14,11 +14,11 @@ var prometheusAddress *url.URL
 
 func Run(c *cli.Context) error {
 	config = parseConfigFile(c.String("config"))
-	promURL, err := url.Parse(config.Global.PrometheusAddress)
+	promAddress, err := url.Parse(config.Global.PrometheusAddress)
 	if err != nil {
 		log.Fatal(err)
 	}
-	prometheusAddress = promURL
+	prometheusAddress = promAddress
 	reverseProxy := httputil.NewSingleHostReverseProxy(prometheusAddress)
 	http.HandleFunc("/", processRequest(reverseProxy.ServeHTTP))
 	if err = http.ListenAndServe(":9999", nil); err != nil {
