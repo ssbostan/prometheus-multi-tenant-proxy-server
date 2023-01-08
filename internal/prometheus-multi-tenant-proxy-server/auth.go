@@ -7,18 +7,17 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"reflect"
 )
 
 func authUser(w http.ResponseWriter, r *http.Request) bool {
 	username, password, ok := r.BasicAuth()
-	user := getUser(username)
+	user, exists := getUser(username)
 	project := r.Header.Get("X-Project-Name")
 	ip, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
 		ip = r.RemoteAddr
 	}
-	if !ok || reflect.ValueOf(user).IsZero() == true {
+	if !ok || exists == false {
 		return false
 	}
 	if !authenticate(user, password) || !authorize(user, project) {
@@ -28,13 +27,13 @@ func authUser(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
-func getUser(username string) UserConfiguration {
+func getUser(username string) (UserConfiguration, bool) {
 	for _, user := range config.Users {
 		if subtle.ConstantTimeCompare([]byte(username), []byte(user.Username)) == 1 {
-			return user
+			return user, true
 		}
 	}
-	return UserConfiguration{}
+	return UserConfiguration{}, false
 }
 
 func authenticate(user UserConfiguration, password string) bool {
