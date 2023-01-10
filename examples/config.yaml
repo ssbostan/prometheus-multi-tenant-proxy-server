@@ -1,5 +1,5 @@
 global:
-  prometheusAddress: http://localhost:9090
+  prometheusAddress: http://prometheus:9090
 users:
   - username: ssbostan
     password: 8a1b08035d1a6023460ea5276478389f9cb55f44
