@@ -13,6 +13,7 @@ type Config struct {
 }
 
 type GlobalConfiguration struct {
+	ListenAddress     string `yaml:"listenAddress"`
 	PrometheusAddress string `yaml:"prometheusAddress"`
 }
 
