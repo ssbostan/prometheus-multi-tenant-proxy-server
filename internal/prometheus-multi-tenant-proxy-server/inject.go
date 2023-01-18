@@ -12,13 +12,13 @@ import (
 	"github.com/prometheus/prometheus/promql/parser"
 )
 
-func injectProjectLabel(w http.ResponseWriter, r *http.Request) bool {
+func injectAccessLabel(w http.ResponseWriter, r *http.Request) bool {
 	labelEnforcer := injectproxy.NewEnforcer(
 		false,
 		&labels.Matcher{
 			Type:  labels.MatchEqual,
-			Name:  "project",
-			Value: r.Header.Get("X-Project-Name"),
+			Name:  config.Global.AccessTargetLabel,
+			Value: r.Header.Get(config.Global.AccessRequestHeader),
 		},
 	)
 	if err := r.ParseForm(); err != nil {
@@ -26,8 +26,8 @@ func injectProjectLabel(w http.ResponseWriter, r *http.Request) bool {
 		return false
 	}
 	rawQueryForm, postForm := splitForm(r.Form, r.PostForm)
-	newRawQueryForm, newRawQueryFormOK := enforceProjectLabel(rawQueryForm, labelEnforcer)
-	newPostForm, newPostFormOK := enforceProjectLabel(postForm, labelEnforcer)
+	newRawQueryForm, newRawQueryFormOK := enforceAccessLabel(rawQueryForm, labelEnforcer)
+	newPostForm, newPostFormOK := enforceAccessLabel(postForm, labelEnforcer)
 	if newRawQueryFormOK == false || newPostFormOK == false {
 		return false
 	}
@@ -37,7 +37,7 @@ func injectProjectLabel(w http.ResponseWriter, r *http.Request) bool {
 	return true
 }
 
-func enforceProjectLabel(form url.Values, labelEnforcer *injectproxy.Enforcer) (url.Values, bool) {
+func enforceAccessLabel(form url.Values, labelEnforcer *injectproxy.Enforcer) (url.Values, bool) {
 	for key, values := range form {
 		if key == "query" || key == "match[]" {
 			form.Del(key)

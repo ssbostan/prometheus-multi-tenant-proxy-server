@@ -1,9 +1,11 @@
 global:
   listenAddress: 0.0.0.0:9999
   prometheusAddress: http://prometheus:9090
+  accessRequestHeader: X-Project-Name
+  accessTargetLabel: project
 users:
-  - username: ssbostan
-    password: 8a1b08035d1a6023460ea5276478389f9cb55f44
-    projects:
-      - testproject1
-      - testproject2
+  - username: admin
+    password: d033e22ae348aeb5660fc2140aec35850c4da997
+    accesses:
+      - project1
+      - project2

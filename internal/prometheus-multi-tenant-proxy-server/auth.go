@@ -12,7 +12,7 @@ import (
 func authUser(w http.ResponseWriter, r *http.Request) bool {
 	username, password, ok := r.BasicAuth()
 	user, exists := getUser(username)
-	project := r.Header.Get("X-Project-Name")
+	access := r.Header.Get(config.Global.AccessRequestHeader)
 	ip, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
 		ip = r.RemoteAddr
@@ -20,23 +20,23 @@ func authUser(w http.ResponseWriter, r *http.Request) bool {
 	if !ok || exists == false {
 		return false
 	}
-	if !authenticate(user, password) || !authorize(user, project) {
+	if !authenticate(user, password) || !authorize(user, access) {
 		log.Printf("[WARNING] Unauthorized request ip=%s user=%s\n", ip, username)
 		return false
 	}
 	return true
 }
 
-func getUser(username string) (UserConfiguration, bool) {
+func getUser(username string) (UserConfig, bool) {
 	for _, user := range config.Users {
 		if subtle.ConstantTimeCompare([]byte(username), []byte(user.Username)) == 1 {
 			return user, true
 		}
 	}
-	return UserConfiguration{}, false
+	return UserConfig{}, false
 }
 
-func authenticate(user UserConfiguration, password string) bool {
+func authenticate(user UserConfig, password string) bool {
 	sha1Hash := sha1.New()
 	sha1Hash.Write([]byte(password))
 	passwordHash := hex.EncodeToString(sha1Hash.Sum(nil))
@@ -46,9 +46,9 @@ func authenticate(user UserConfiguration, password string) bool {
 	return false
 }
 
-func authorize(user UserConfiguration, project string) bool {
-	for _, p := range user.Projects {
-		if subtle.ConstantTimeCompare([]byte(p), []byte(project)) == 1 {
+func authorize(user UserConfig, access string) bool {
+	for _, a := range user.Accesses {
+		if subtle.ConstantTimeCompare([]byte(a), []byte(access)) == 1 {
 			return true
 		}
 	}

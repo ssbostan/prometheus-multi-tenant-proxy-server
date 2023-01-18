@@ -8,19 +8,21 @@ import (
 )
 
 type Config struct {
-	Global GlobalConfiguration `yaml:"global"`
-	Users  []UserConfiguration `yaml:"users"`
+	Global GlobalConfig `yaml:"global"`
+	Users  []UserConfig `yaml:"users"`
 }
 
-type GlobalConfiguration struct {
-	ListenAddress     string `yaml:"listenAddress"`
-	PrometheusAddress string `yaml:"prometheusAddress"`
+type GlobalConfig struct {
+	ListenAddress       string `yaml:"listenAddress"`
+	PrometheusAddress   string `yaml:"prometheusAddress"`
+	AccessRequestHeader string `yaml:"accessRequestHeader"`
+	AccessTargetLabel   string `yaml:"accessTargetLabel"`
 }
 
-type UserConfiguration struct {
+type UserConfig struct {
 	Username string   `yaml:"username"`
 	Password string   `yaml:"password"`
-	Projects []string `yaml:"projects"`
+	Accesses []string `yaml:"accesses"`
 }
 
 func parseConfigFile(configFile string) Config {

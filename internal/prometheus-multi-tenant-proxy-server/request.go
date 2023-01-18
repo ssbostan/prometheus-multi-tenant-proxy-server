@@ -12,7 +12,7 @@ func processRequest(handler http.HandlerFunc) http.HandlerFunc {
 			unauthorizedRequest(w)
 			return
 		}
-		if !injectProjectLabel(w, r) {
+		if !injectAccessLabel(w, r) {
 			badRequest(w)
 			return
 		}
@@ -24,12 +24,12 @@ func processRequest(handler http.HandlerFunc) http.HandlerFunc {
 
 func logRequest(w http.ResponseWriter, r *http.Request) {
 	username, _, _ := r.BasicAuth()
-	project := r.Header.Get("X-Project-Name")
+	access := r.Header.Get(config.Global.AccessRequestHeader)
 	ip, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err != nil {
 		ip = r.RemoteAddr
 	}
-	log.Printf("[INFO] Accept request ip=%s user=%s project=%s\n", ip, username, project)
+	log.Printf("[INFO] Accept request ip=%s user=%s access=%s\n", ip, username, access)
 }
 
 func updateRequest(w http.ResponseWriter, r *http.Request) {
