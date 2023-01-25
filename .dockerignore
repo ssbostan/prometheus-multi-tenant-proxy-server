@@ -4,6 +4,8 @@ Dockerfile
 .dockerignore
 LICENSE
 README.md
+*.png
+*.drawio
 
 # Binaries for programs and plugins
 *.exe
