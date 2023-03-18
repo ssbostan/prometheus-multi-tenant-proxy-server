@@ -21,7 +21,9 @@ WORKDIR /opt/app
 COPY --from=builder /opt/src/prometheus-multi-tenant-proxy-server .
 COPY --from=builder /opt/src/examples/config.yaml /opt/config/config.yaml
 
-USER nobody
+RUN adduser -DH rootless
+
+USER rootless
 
 ENTRYPOINT ["./prometheus-multi-tenant-proxy-server"]
 
