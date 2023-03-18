@@ -19,8 +19,10 @@ EXPOSE 9999
 WORKDIR /opt/app
 
 COPY --from=builder /opt/src/prometheus-multi-tenant-proxy-server .
-COPY --from=builder /opt/src/examples/config.yaml .
+COPY --from=builder /opt/src/examples/config.yaml /opt/config/config.yaml
+
+USER nobody
 
 ENTRYPOINT ["./prometheus-multi-tenant-proxy-server"]
 
-CMD ["--config", "config.yaml"]
+CMD ["--config", "/opt/config/config.yaml"]
