@@ -4,6 +4,10 @@ global:
   accessRequestHeader: X-Project-Name
   accessTargetLabel: project
 users:
+  - username: kube-probe
+    password: d755722d35716ed1fc59c909f3a70abc3b09157d
+    accesses:
+      - healthcheck-endpoints
   - username: admin
     password: d033e22ae348aeb5660fc2140aec35850c4da997
     accesses:
