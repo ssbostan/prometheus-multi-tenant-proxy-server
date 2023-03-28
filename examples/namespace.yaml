@@ -1,0 +1,17 @@
+global:
+  listenAddress: 0.0.0.0:9999
+  prometheusAddress: http://prometheus:9090
+  accessRequestHeader: X-Namespace-Name
+  accessTargetLabel: namespace
+users:
+  - username: kube-probe
+    password: d755722d35716ed1fc59c909f3a70abc3b09157d
+    accesses:
+      - healthcheck-endpoints
+  - username: admin
+    password: d033e22ae348aeb5660fc2140aec35850c4da997
+    accesses:
+      - default
+      - kube-system
+      - kube-public
+      - kube-node-lease
