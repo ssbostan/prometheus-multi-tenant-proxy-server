@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-multi-tenant-proxy-server
+  labels:
+    app.kubernetes.io/name: prometheus-multi-tenant-proxy-server
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: prometheus-multi-tenant-proxy-server
+  ports:
+    - name: http
+      port: 80
+      targetPort: 9999
+      protocol: TCP
