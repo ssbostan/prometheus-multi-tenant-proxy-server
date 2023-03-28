@@ -1,0 +1,21 @@
+Installation complete.
+
+To access Prometheus use the following address:
+{{- if .Values.ingress.enabled }}
+  http{{- if .Values.ingress.tlsSecretName -}}s{{- end -}}://{{ .Values.ingress.host }}
+{{- else }}
+  http://{{ include "prometheus-multi-tenant-proxy-server.fullname" . }}:{{ .Values.service.port }}
+{{- end }}
+
+{{ if .Values.deployment.healthcheck.enabled -}}
+As this application uses Prometheus healthcheck endpoints for its healthcheck, Downtime to the original Prometheus instance causes this application downtime.
+
+Healthcheck endpoints:
+{{- if .Values.ingress.enabled }}
+  http{{- if .Values.ingress.tlsSecretName -}}s{{- end -}}://{{ .Values.ingress.host }}/-/healthy
+  http{{- if .Values.ingress.tlsSecretName -}}s{{- end -}}://{{ .Values.ingress.host }}/-/ready
+{{- else }}
+  http://{{ include "prometheus-multi-tenant-proxy-server.fullname" . }}:{{ .Values.service.port }}/-/healthy
+  http://{{ include "prometheus-multi-tenant-proxy-server.fullname" . }}:{{ .Values.service.port }}/-/ready
+{{- end }}
+{{- end }}

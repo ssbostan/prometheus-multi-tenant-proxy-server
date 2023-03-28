@@ -1,0 +1,75 @@
+nameOverride: ""
+
+fullnameOverride: ""
+
+deployment:
+  annotations: {}
+  podAnnotations: {}
+  replicaCount: 2
+
+  image:
+    repository: ssbostan/prometheus-multi-tenant-proxy-server
+    tag: latest
+
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+
+  containerSecurityContext:
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
+
+  healthcheck:
+    enabled: true
+    httpHeaders:
+      - name: Authorization
+        value: Basic a3ViZS1wcm9iZTprdWJlLXByb2Jl # kube-probe:kube-probe
+      - name: X-Project-Name
+        value: healthcheck-endpoints
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 16Mi
+    limits:
+      cpu: 1000m
+      memory: 128Mi
+
+  affinity: {}
+
+  nodeSelector: {}
+
+  tolerations: []
+
+config:
+  annotations: {}
+  data: |
+    global:
+      listenAddress: 0.0.0.0:9999
+      prometheusAddress: http://prometheus:9090
+      accessRequestHeader: X-Project-Name
+      accessTargetLabel: project
+    users:
+      - username: kube-probe
+        password: d755722d35716ed1fc59c909f3a70abc3b09157d
+        accesses:
+          - healthcheck-endpoints
+      - username: admin
+        password: d033e22ae348aeb5660fc2140aec35850c4da997
+        accesses:
+          - project1
+          - project2
+
+service:
+  annotations: {}
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  annotations: {}
+  host: prometheus.example.com
+  tlsSecretName: ""
+  className: ""
