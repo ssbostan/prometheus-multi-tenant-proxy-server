@@ -19,11 +19,11 @@ EXPOSE 9999
 WORKDIR /opt/app
 
 COPY --from=builder /opt/src/prometheus-multi-tenant-proxy-server .
-COPY --from=builder /opt/src/examples/config.yaml /opt/config/config.yaml
+COPY --from=builder /opt/src/examples/namespace.yaml /opt/config/config.yaml
 
 RUN adduser -DH rootless
 
-USER rootless
+USER 1000
 
 ENTRYPOINT ["./prometheus-multi-tenant-proxy-server"]
 
