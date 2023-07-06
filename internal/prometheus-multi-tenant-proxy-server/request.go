@@ -22,7 +22,7 @@ func processRequest(handler http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func logRequest(w http.ResponseWriter, r *http.Request) {
+func logRequest(_ http.ResponseWriter, r *http.Request) {
 	username, _, _ := r.BasicAuth()
 	access := r.Header.Get(config.Global.AccessRequestHeader)
 	ip, _, err := net.SplitHostPort(r.RemoteAddr)
@@ -32,7 +32,7 @@ func logRequest(w http.ResponseWriter, r *http.Request) {
 	log.Printf("[INFO] Accept request ip=%s user=%s access=%s\n", ip, username, access)
 }
 
-func updateRequest(w http.ResponseWriter, r *http.Request) {
+func updateRequest(_ http.ResponseWriter, r *http.Request) {
 	r.Host = prometheusAddress.Host
 	r.URL.Host = prometheusAddress.Host
 	r.URL.Scheme = prometheusAddress.Scheme

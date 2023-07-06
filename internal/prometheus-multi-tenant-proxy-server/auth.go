@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-func authUser(w http.ResponseWriter, r *http.Request) bool {
+func authUser(_ http.ResponseWriter, r *http.Request) bool {
 	username, password, ok := r.BasicAuth()
 	user, exists := getUser(username)
 	access := r.Header.Get(config.Global.AccessRequestHeader)
