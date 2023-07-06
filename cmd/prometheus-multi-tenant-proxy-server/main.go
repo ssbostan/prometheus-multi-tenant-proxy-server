@@ -13,7 +13,7 @@ func main() {
 		Name:  "prometheus-multi-tenant-proxy-server",
 		Usage: "Multi-tenant reverse proxy for Prometheus server",
 		Authors: []*cli.Author{
-			&cli.Author{
+			{
 				Name:  "Saeid Bostandoust",
 				Email: "ssbostan@yahoo.com",
 			},

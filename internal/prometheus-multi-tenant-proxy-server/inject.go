@@ -1,7 +1,7 @@
 package server
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -12,7 +12,7 @@ import (
 	"github.com/prometheus/prometheus/promql/parser"
 )
 
-func injectAccessLabel(w http.ResponseWriter, r *http.Request) bool {
+func injectAccessLabel(_ http.ResponseWriter, r *http.Request) bool {
 	labelEnforcer := injectproxy.NewEnforcer(
 		false,
 		&labels.Matcher{
@@ -32,7 +32,7 @@ func injectAccessLabel(w http.ResponseWriter, r *http.Request) bool {
 		return false
 	}
 	r.URL.RawQuery = newRawQueryForm.Encode()
-	r.Body = ioutil.NopCloser(strings.NewReader(newPostForm.Encode()))
+	r.Body = io.NopCloser(strings.NewReader(newPostForm.Encode()))
 	r.ContentLength = int64(len(newPostForm.Encode()))
 	return true
 }
